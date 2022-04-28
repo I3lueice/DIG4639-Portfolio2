@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import { useCallback, useState } from 'react';
-import { FlatList, StyleSheet, Text, View } from 'react-native';
+import { FlatList, StyleSheet, Text, View, TextInput } from 'react-native';
 import { Button, Card, CheckBox } from 'react-native-elements';
 
 let questions = [
@@ -14,6 +14,8 @@ let questions = [
       { correct: true, title: "Black" },
     ]
   },
+
+
   {
     title: "UCF Mascots",
     multipleAnswers: true,
@@ -24,10 +26,22 @@ let questions = [
       { correct: true, title: "Pegasus" },
     ]
   },
+  
+
+  {
+    title: "UCF Mascccots",
+    multipleAnswers: true,
+    answers: [
+      { correct: true, title: "Knightro" },
+      { correct: false, title: "Gator" },
+      { correct: false, title: "Bull" },
+      { correct: true, title: "Pegasus" },
+    ]
+  },
 ]
 export default function App() {
-  let [score, setScore] = useState()
 
+  let [score, setScore] = useState()
   let [answers, setAnswers] = useState([])
   let checkAnswers = useCallback((data, qAnswers) => {
     let answersCorrect = true
@@ -52,7 +66,7 @@ export default function App() {
     } else {
       setScore(prevScore => prevScore === undefined ? 0 : prevScore)
     }
-  }, [answers, score])
+  }, [answers, score,])
   return <>
     <View style={styles.container}>
       <Text>Quiz Application</Text>
@@ -68,6 +82,13 @@ export default function App() {
           answers={answers[index]}
         ></Question>
       }></FlatList>
+
+
+  <WrittenR>
+  </WrittenR>
+  
+
+
       <Button title='Submit' onPress={
         () => questions.forEach((q, i) => checkAnswers(q, answers[i]))}
         disabled={answers.length == 0}></Button>
@@ -78,6 +99,46 @@ export default function App() {
 }
 
 
+
+function WrittenR () {
+  let simplerVar = "What year was UCF founded"
+  let [applicationState, setApplicationState] = useState(false)
+  let [textValue, setTextValue] = useState("")
+ 
+  let pressButton = useCallback(() => {
+    
+
+    if (textValue === "1963") {
+      setApplicationState(true)
+      setError("")
+    } else {
+      setError()
+      
+    }
+    
+  }, [textValue])
+
+  return (
+    applicationState ? 
+  <View style={styles.container2}>
+    <Text style={styles.text}>correct</Text>
+  </View>
+  :
+    <View style={styles.container2}>
+      <View>
+        <Text style={styles.text} >{simplerVar}</Text>
+      </View>
+
+      <TextInput
+      style={styles.input} value={textValue} onChangeText={setTextValue} placeholder="0000">
+      </TextInput>
+
+      <Button title='1963' onPress={pressButton} ></Button>
+
+    </View>
+
+  );
+}
 
 
 
@@ -129,4 +190,27 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+
+  input: {
+    height: 40,
+    margin: 12,
+    borderWidth: 1,
+    padding: 10,
+  },
+  container2: {
+    flex: 1,
+    flexDirection: "column",
+    height: 100,
+    padding: 20,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  text: {
+      fontWeight: "bold",
+      fontSize: "1.5rem",
+      marginVertical: "1em",
+      textAlign: "center"
+   },
+
 });
