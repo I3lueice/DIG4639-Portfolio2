@@ -1,7 +1,10 @@
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
 import { useCallback, useState } from 'react';
 import { FlatList, StyleSheet, Text, View, TextInput } from 'react-native';
 import { Button, Card, CheckBox } from 'react-native-elements';
+
 
 let questions = [
   {
@@ -15,7 +18,6 @@ let questions = [
     ]
   },
 
-
   {
     title: "UCF Mascots",
     multipleAnswers: true,
@@ -27,24 +29,58 @@ let questions = [
     ]
   },
   
-
-  {
-    title: "UCF Mascccots",
-    multipleAnswers: true,
-    answers: [
-      { correct: true, title: "Knightro" },
-      { correct: false, title: "Gator" },
-      { correct: false, title: "Bull" },
-      { correct: true, title: "Pegasus" },
-    ]
-  },
 ]
-export default function App() {
 
+const Stack = createNativeStackNavigator();
+function RepetitionExerciseScreen({ route, navigation }) {
+  let { exerciseList, exerciseKey } = route.params
+  let gotoExercise = useCallback(() => {
+    navigation.push("RepetitionExercise", { exerciseKey: "2", exerciseList: exerciseList, count: route.params.count + 1 })
+  })
+  let currentExercise = exerciseList.find(ex => ex.key === exerciseKey)
+
+  return (
+    <View style={styles.container}>
+      <Text>{currentExercise.name} : {route.params.count} </Text>
+      <Button onPress={gotoExercise} title='New Screen'></Button>
+      <Button onPress={() => navigation.navigate("Home")} title='Home'></Button>
+      <StatusBar style="auto" />
+    </View>
+  )
+}
+
+
+
+function HomeScreen({ navigation }) {
+  let exerciseList = [
+    {
+      name: "Ex1",
+      key: "1"
+    },
+    {
+      name: "Ex2",
+      key: "2"
+    },
+  ]
+  let gotoExercise = useCallback(({ key }) => {
+    navigation.navigate("RepetitionExercise", { exerciseKey: key, count: 0, exerciseList: exerciseList })
+  })
+  return (
+    <View style={styles.container}>
+      <FlatList data={exerciseList} renderItem={({ item }) =>
+        <Button onPress={() => gotoExercise(item)} title={item.name}></Button>
+      } />
+      <StatusBar style="auto" />
+    </View>
+  )
+}
+
+export default function App() {
   let [score, setScore] = useState()
   let [answers, setAnswers] = useState([])
   let checkAnswers = useCallback((data, qAnswers) => {
     let answersCorrect = true
+
     for (let i = 0; i < data.answers.length; i++) {
       let qCorrect
       if (data.answers[i].correct) {
@@ -68,6 +104,13 @@ export default function App() {
     }
   }, [answers, score,])
   return <>
+  <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name="RepetitionExercise" component={RepetitionExerciseScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
+
     <View style={styles.container}>
       <Text>Quiz Application</Text>
       <FlatList data={questions} renderItem={({ item, index }) =>
@@ -82,12 +125,6 @@ export default function App() {
           answers={answers[index]}
         ></Question>
       }></FlatList>
-
-
-  <WrittenR>
-  </WrittenR>
-  
-
 
       <Button title='Submit' onPress={
         () => questions.forEach((q, i) => checkAnswers(q, answers[i]))}
@@ -113,7 +150,6 @@ function WrittenR () {
       setError("")
     } else {
       setError()
-      
     }
     
   }, [textValue])
