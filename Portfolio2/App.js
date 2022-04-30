@@ -31,51 +31,20 @@ let questions = [
   
 ]
 
+
+
 const Stack = createNativeStackNavigator();
-function RepetitionExerciseScreen({ route, navigation }) {
-  let { exerciseList, exerciseKey } = route.params
-  let gotoExercise = useCallback(() => {
-    navigation.push("RepetitionExercise", { exerciseKey: "2", exerciseList: exerciseList, count: route.params.count + 1 })
-  })
-  let currentExercise = exerciseList.find(ex => ex.key === exerciseKey)
 
+function writtenResponseScreen({ navigation }) {
   return (
     <View style={styles.container}>
-      <Text>{currentExercise.name} : {route.params.count} </Text>
-      <Button onPress={gotoExercise} title='New Screen'></Button>
-      <Button onPress={() => navigation.navigate("Home")} title='Home'></Button>
+      <WrittenR></WrittenR>
       <StatusBar style="auto" />
     </View>
   )
 }
 
-
-
-function HomeScreen({ navigation }) {
-  let exerciseList = [
-    {
-      name: "Ex1",
-      key: "1"
-    },
-    {
-      name: "Ex2",
-      key: "2"
-    },
-  ]
-  let gotoExercise = useCallback(({ key }) => {
-    navigation.navigate("RepetitionExercise", { exerciseKey: key, count: 0, exerciseList: exerciseList })
-  })
-  return (
-    <View style={styles.container}>
-      <FlatList data={exerciseList} renderItem={({ item }) =>
-        <Button onPress={() => gotoExercise(item)} title={item.name}></Button>
-      } />
-      <StatusBar style="auto" />
-    </View>
-  )
-}
-
-export default function App() {
+function multipleChoiceScreen({ navigation }) {
   let [score, setScore] = useState()
   let [answers, setAnswers] = useState([])
   let checkAnswers = useCallback((data, qAnswers) => {
@@ -103,16 +72,9 @@ export default function App() {
       setScore(prevScore => prevScore === undefined ? 0 : prevScore)
     }
   }, [answers, score,])
-  return <>
-  <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen name="Home" component={HomeScreen} />
-        <Stack.Screen name="RepetitionExercise" component={RepetitionExerciseScreen} />
-      </Stack.Navigator>
-    </NavigationContainer>
-
+  return (
     <View style={styles.container}>
-      <Text>Quiz Application</Text>
+      <Text style={styles.text}>Quiz Application</Text>
       <FlatList data={questions} renderItem={({ item, index }) =>
         <Question showAnswers={score !== undefined} data={item} key={index}
           setAnswers={
@@ -132,6 +94,49 @@ export default function App() {
       {score !== undefined ? <Text>Score:{score} </Text> : undefined}
       <StatusBar style="auto" />
     </View>
+  )
+}
+
+function fillintheBlankScreen({ navigation }) {
+  return (
+    <View style={styles.container}>
+      <Text>fill in the blank</Text>
+      <StatusBar style="auto" />
+    </View>
+  )
+}
+
+function HomeScreen({ navigation }) {
+  let gotoPage2 = useCallback(() => {
+    navigation.navigate("Written Response")
+  })
+  let gotoPage3 = useCallback(() => {
+    navigation.navigate("Multiple Choice")
+  })
+  let gotoPage4 = useCallback(() => {
+    navigation.navigate("Fill in the Blank")
+  })
+  return (
+    <View style={styles.container}>
+    <Text style={styles.text}>UCF Trivia</Text>
+    <Button onPress={gotoPage2} title="Written Response"></Button>
+    <Button onPress={gotoPage3} title="Multiple Choice"></Button>
+    <Button onPress={gotoPage4} title="Fill in the Blank"></Button>
+    <StatusBar style="auto" />
+    </View>
+      )
+}
+
+export default function App() {
+  return <>
+  <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name="Written Response" component={writtenResponseScreen} />
+        <Stack.Screen name="Multiple Choice" component={multipleChoiceScreen} />
+        <Stack.Screen name="Fill in the Blank" component={fillintheBlankScreen} />
+      </Stack.Navigator>
+  </NavigationContainer>
   </>
 }
 
@@ -143,13 +148,11 @@ function WrittenR () {
   let [textValue, setTextValue] = useState("")
  
   let pressButton = useCallback(() => {
-    
-
     if (textValue === "1963") {
       setApplicationState(true)
-      setError("")
+
     } else {
-      setError()
+
     }
     
   }, [textValue])
@@ -168,11 +171,9 @@ function WrittenR () {
       <TextInput
       style={styles.input} value={textValue} onChangeText={setTextValue} placeholder="0000">
       </TextInput>
-
-      <Button title='1963' onPress={pressButton} ></Button>
-
+      
+      <Button title='Submit' onPress={pressButton} ></Button>
     </View>
-
   );
 }
 
@@ -180,7 +181,6 @@ function WrittenR () {
 
 function Question({ data, answers, showAnswers, setAnswers }) {
   let selectAnswer = useCallback((index) => {
-    console.log("onPress()", index, answers);
     if (answers === undefined) {
       answers = []
     }
